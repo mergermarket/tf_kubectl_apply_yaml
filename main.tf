@@ -17,26 +17,30 @@ provider "kubernetes" {
   load_config_file       = false
 }
 
-//# Sample code for setting up a trigger based on changes to
-//
-# the actual resources.
-//# Not working 100% as it triggers when resource has just
-//# been created
-//data "external" "kubernetes-dashboard-role" {
-//  program = ["${path.module}/external_scripts/describe_object.sh"]
-//  query = {
-//    type      = "rolebindings"
-//    name      = "kubernetes-dashboard-minimal"
-//    namespace = "kube-system"
-//  }
-//}
+data "template_file" "kubeconfig" {
+  template = "${file("${path.module}/templates/kubeconfig.tpl")}"
+
+  vars {
+    cluster_name                      = "${data.aws_eks_cluster.eks_cluster.name}"
+    kubeconfig_name                   = "jenkins"
+    endpoint                          = "${data.aws_eks_cluster.eks_cluster.endpoint}"
+    cluster_auth_base64               = "${data.aws_eks_cluster.eks_cluster.certificate_authority.0.data}"
+    aws_authenticator_command         = "aws-iam-authenticator"
+  }
+}
+
+resource "local_file" "kubeconfig" {
+  content  = "${data.template_file.kubeconfig.rendered}"
+  filename = "./kubeconfig"
+}
 
 resource "null_resource" "apply-yaml" {
   triggers = {
     yaml_sha1 = "${sha1(file("${path.root}/${var.filename}"))}"
-//    resource_sha1 = "${sha1(lookup(data.external.kubernetes-dashboard-role.result, "roles", ""))}"
   }
   provisioner "local-exec" {
-    command = "kubectl apply -f ${path.root}/${var.filename}"
+    command = "kubectl --kubeconfig ./kubeconfig apply -f ${path.root}/${var.filename}"
   }
 }
+
+
