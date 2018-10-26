@@ -3,7 +3,7 @@ data "aws_eks_cluster" "eks_cluster" {
 }
 
 data "external" "aws_iam_authenticator" {
-  program = ["${path.module}/external_scripts/get_token.sh"]
+  program = ["python", "${path.module}/external_scripts/get_token.py"]
 
   query = {
     cluster = "${data.aws_eks_cluster.eks_cluster.id}"
