@@ -35,6 +35,7 @@ resource "local_file" "kubeconfig" {
 }
 
 resource "null_resource" "apply-yaml" {
+  depends_on = ["local_file.kubeconfig"]
   triggers = {
     yaml_sha1 = "${sha1(file("${path.root}/${var.filename}"))}"
   }
