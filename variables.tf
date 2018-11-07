@@ -1,4 +1,4 @@
-variable "filename" {
+variable "yaml" {
   type = "string"
-  description = "name of the yaml file to load"
+  description = "the yaml to load"
 }
