@@ -41,7 +41,9 @@ resource "local_file" "yaml_file" {
 
 resource "null_resource" "apply-yaml" {
   depends_on = ["local_file.kubeconfig", "local_file.yaml_file"]
-
+  triggers = {
+    sha1 = "${sha1(var.yaml)}"
+  }
   provisioner "local-exec" {
     command = "kubectl --kubeconfig ./kubeconfig apply -f ${path.root}/${var.yaml_filename}"
   }
