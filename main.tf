@@ -43,7 +43,7 @@ resource "null_resource" "apply-yaml" {
   depends_on = ["local_file.kubeconfig", "local_file.yaml_file"]
 
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig ./kubecoonfig apply -f ${path.root}/${var.yaml_filename}"
+    command = "kubectl --kubeconfig ./kubeconfig apply -f ${path.root}/${var.yaml_filename}"
   }
 }
 
