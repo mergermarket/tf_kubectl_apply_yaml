@@ -34,7 +34,7 @@ resource "local_file" "kubeconfig" {
   filename = "./kubeconfig"
 }
 
-esource "local_file" "yaml_file" {
+resource "local_file" "yaml_file" {
   content  = "${var.yaml}"
   filename = "./the.yaml"
 }
