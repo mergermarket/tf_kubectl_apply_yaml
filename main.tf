@@ -35,6 +35,9 @@ resource "local_file" "kubeconfig" {
 }
 
 resource "local_file" "yaml_file" {
+  triggers = {
+    sha1 = "${sha1(var.yaml)}"
+  }
   content  = "${var.yaml}"
   filename = "${path.root}/${var.yaml_filename}"
 }
