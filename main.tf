@@ -35,11 +35,8 @@ resource "local_file" "kubeconfig" {
 }
 
 resource "local_file" "yaml_file" {
-  triggers = {
-    sha1 = "${sha1(var.yaml)}"
-  }
   content  = "${var.yaml}"
-  filename = "${path.root}/${var.yaml_filename}"
+  filename = "${path.root}/${var.yaml_filename}.${uuid()}"
 }
 
 resource "null_resource" "apply-yaml" {
@@ -48,7 +45,7 @@ resource "null_resource" "apply-yaml" {
     sha1 = "${sha1(var.yaml)}"
   }
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig ./kubeconfig apply -f ${path.root}/${var.yaml_filename}"
+    command = "kubectl --kubeconfig ./kubeconfig apply -f ${local_file.yaml_file.filename}"
   }
 }
 
