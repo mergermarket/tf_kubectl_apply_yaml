@@ -1,5 +1,5 @@
 data "aws_eks_cluster" "eks_cluster" {
-  name = "jenkins-eks"
+  name = "${var.jenkins_eks_cluster}"
 }
 
 data "external" "aws_iam_authenticator" {
@@ -21,11 +21,11 @@ data "template_file" "kubeconfig" {
   template = "${file("${path.module}/templates/kubeconfig.tpl")}"
 
   vars {
-    cluster_name                      = "${data.aws_eks_cluster.eks_cluster.name}"
-    kubeconfig_name                   = "jenkins"
-    endpoint                          = "${data.aws_eks_cluster.eks_cluster.endpoint}"
-    cluster_auth_base64               = "${data.aws_eks_cluster.eks_cluster.certificate_authority.0.data}"
-    aws_authenticator_command         = "aws-iam-authenticator"
+    cluster_name              = "${data.aws_eks_cluster.eks_cluster.name}"
+    kubeconfig_name           = "jenkins"
+    endpoint                  = "${data.aws_eks_cluster.eks_cluster.endpoint}"
+    cluster_auth_base64       = "${data.aws_eks_cluster.eks_cluster.certificate_authority.0.data}"
+    aws_authenticator_command = "aws-iam-authenticator"
   }
 }
 
@@ -41,12 +41,12 @@ resource "local_file" "yaml_file" {
 
 resource "null_resource" "apply-yaml" {
   depends_on = ["local_file.kubeconfig", "local_file.yaml_file"]
+
   triggers = {
     sha1 = "${sha1(var.yaml)}"
   }
+
   provisioner "local-exec" {
     command = "kubectl --kubeconfig ./kubeconfig apply -f ${local_file.yaml_file.filename}"
   }
 }
-
-
