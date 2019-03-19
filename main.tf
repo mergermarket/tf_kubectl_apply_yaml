@@ -1,5 +1,5 @@
 data "aws_eks_cluster" "eks_cluster" {
-  name = "${var.jenkins_eks_cluster}"
+  name = "${var.cluster_name}"
 }
 
 data "external" "aws_iam_authenticator" {
